@@ -8,11 +8,6 @@
 (setq mac-command-modifier 'meta)
 (setq mac-option-modifier nil)
 
-;; Encodings
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
-
 ;;(setq inhibit-startup-echo-area-message t)
 
 ;;
