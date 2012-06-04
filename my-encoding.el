@@ -1,4 +1,6 @@
-
+;;
+;; encoding configuration
+;;
 
 (defun set-encoding-utf-8 ( )
   "set encoding as utf-8"
