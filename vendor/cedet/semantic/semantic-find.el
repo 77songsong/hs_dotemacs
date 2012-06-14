@@ -372,14 +372,9 @@ See `semantic-tag-protected-p' for details on which tags are returned."
        table)))
 
 ;;;###autoload
-(define-overloadable-function semantic-find-tags-included (&optional table)
+(defsubst semantic-find-tags-included (&optional table)
   "Find all tags in TABLE that are of the 'include class.
-TABLE is a tag table.  See `semantic-something-to-tag-table'.")
-
-(defun semantic-find-tags-included-default (&optional table)
-  "Find all tags in TABLE that are of the 'include class.
-TABLE is a tag table.  See `semantic-something-to-tag-table'.
-By default, just call `semantic-find-tags-by-class'."
+TABLE is a tag table.  See `semantic-something-to-tag-table'."
   (semantic-find-tags-by-class 'include table))
 
 ;;; Deep Searches

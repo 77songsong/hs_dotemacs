@@ -77,20 +77,15 @@
 
 (defconst inversion-decoders
   '(
-    (alpha  "^\\([0-9]+\\)\\.\\([0-9]+\\)\\.?\\([0-9]*\\)?\\s-*\\.?alpha\\([0-9]+\\)?$" 4)
-    (beta   "^\\([0-9]+\\)\\.\\([0-9]+\\)\\.?\\([0-9]*\\)?\\s-*\\.?beta\\([0-9]+\\)?$" 4)
-    (beta   "^\\([0-9]+\\)\\.\\([0-9]+\\)\\.?\\([0-9]*\\)?\\s-*\\.?(beta\\([0-9]+\\)?)$" 4)
-    (beta  "^[^/]+/\\w+--\\w+--\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)--patch-\\([0-9]+\\)" 4)
-    (beta "^\\w+: v\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)-\\([0-9]+\\)-\\(.*\\)" 5)
+    (alpha  "^\\([0-9]+\\)\\.\\([0-9]+\\)\\s-*\\.?alpha\\([0-9]+\\)?$" 3)
+    (beta   "^\\([0-9]+\\)\\.\\([0-9]+\\)\\s-*\\.?beta\\([0-9]+\\)?$" 3)
+    (beta   "^\\([0-9]+\\)\\.\\([0-9]+\\)\\s-*(beta\\([0-9]+\\)?)" 3)
     (prerelease "^\\([0-9]+\\)\\.\\([0-9]+\\)\\s-*\\.?pre\\([0-9]+\\)?$" 3)
-    (full   "^\\([0-9]+\\)\\.\\([0-9]+\\)\\.?\\([0-9]+\\)?$" 3)
+    (full   "^\\([0-9]+\\)\\.\\([0-9]+\\)$" 2)
     (fullsingle "^\\([0-9]+\\)$" 1)
-    (patch  "^\\([0-9]+\\)\\.\\([0-9]+\\)\\.?\\([0-9]+\\)?\\s-*(patch \\([0-9]+\\))" 4)
+    (patch  "^\\([0-9]+\\)\\.\\([0-9]+\\) (patch \\([0-9]+\\))" 3)
     (point  "^\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)$" 3)
-    (point "^\\w+: v\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)-\\(0\\)-\\(.*\\)" 5)
     (build  "^\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\).\\([0-9]+\\)$" 4)
-    (full   "^[^/]+/\\w+--\\w+--\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)--version-\\([0-9]+\\)" 4)
-    (full "^\\w+: v\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)" 5)
     )
   "List of decoders for version strings.
 Each decoder is of the form:
@@ -143,7 +138,7 @@ where RELEASE is a symbol such as `full', or `beta'."
     ;; Decode the code
     (setq code (inversion-decode-version ver))
     (unless code
-      (error "%S-version value (%s) cannot be decoded" package ver))
+      (error "%S-version value cannot be decoded" package))
     code))
 
 (defun inversion-package-incompatibility-version (package)
@@ -198,25 +193,24 @@ not an indication of new features or bug fixes."
 	(v2-3 (nth 3 ver2))
 	(v2-4 (nth 4 ver2))
 	)
-
-    (cond ((and (equal (list v1-1 v1-2 v1-3 v1-4)
-		       (list v2-1 v2-2 v2-3 v2-4))
-		v1-0 v2-0)
-	   (< v1-0 v2-0))
-	  ((and (equal v1-1 v2-1)
-		(equal v1-2 v2-2)
-		(equal v1-3 v2-3)
-		v1-4 v2-4)		; all or nothin if elt - is =
+    (or (and (= v1-0 v2-0)
+	     (= v1-1 v2-1)
+	     (= v1-2 v2-2)
+	     (= v1-3 v2-3)
+	     v1-4 v2-4		; all or nothin if elt - is =
 	     (< v1-4 v2-4))
-	  ((and (equal v1-1 v2-1)
-		(equal v1-2 v2-2)
-		v1-3 v2-3)		; all or nothin if elt - is =
+	(and (= v1-0 v2-0)
+	     (= v1-1 v2-1)
+	     (= v1-2 v2-2)
+	     v1-3 v2-3		; all or nothin if elt - is =
 	     (< v1-3 v2-3))
-	  ((and (equal v1-1 v2-1)
-		v1-2 v2-2)
+	(and (= v1-1 v2-1)
 	     (< v1-2 v2-2))
-	  ((and v1-1 v2-1)
-	   (< v1-1 v2-1))
+	(and (< v1-1 v2-1))
+	(and (< v1-0 v2-0)
+	     (= v1-1 v2-1)
+	     (= v1-2 v2-2)
+	     )
 	)))
 
 (defun inversion-check-version (version incompatible-version
@@ -346,16 +340,13 @@ Optional argument RESERVED is saved for later use."
     package))
 
 ;;;###autoload
-(defun inversion-require-emacs (emacs-ver xemacs-ver sxemacs-ver)
-  "Declare that you need either EMACS-VER, XEMACS-VER or SXEMACE-ver.
+(defun inversion-require-emacs (emacs-ver xemacs-ver)
+  "Declare that you need either EMACS-VER, or XEMACS-VER.
 Only checks one based on which kind of Emacs is being run."
   (let ((err (inversion-test 'emacs
-			     (cond ((featurep 'sxemacs)
-				    sxemacs-ver)
-				   ((featurep 'xemacs)
-				    xemacs-ver)
-				   (t
-				    emacs-ver)))))
+			     (if (featurep 'xemacs)
+				 xemacs-ver
+			       emacs-ver))))
     (if err (error err)
       ;; Something nice...
       t)))

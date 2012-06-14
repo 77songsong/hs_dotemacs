@@ -195,10 +195,8 @@ The resulting bookmark is then sorted within the ring."
 	 (idx 0))
     (when tag
       (while (and (not (ring-empty-p ring)) (< idx (semantic-ring-size ring)))
-	(if (and (eq (semantic-tag-mode tag)
-		     (semantic-tag-mode (oref (ring-ref ring idx) tag)))
-		 (semantic-tag-similar-p (oref (ring-ref ring idx) tag)
-					 tag))
+	(if (semantic-tag-similar-p (oref (ring-ref ring idx) tag)
+				    tag)
 	    (ring-remove ring idx))
 	(setq idx (1+ idx)))
       ;; Create a new mark

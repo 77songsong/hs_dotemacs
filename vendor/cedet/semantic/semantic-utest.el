@@ -289,9 +289,11 @@ r, s, t = 1, 2, '3'
       :type "class")
      nil nil)
     ("DocString" type
-     (:documentation "Documentation string"
-      :type          "class")
-     nil nil)
+     (:members
+      (("\"\"\"Documentation string\"\"\"" code
+	nil (reparse-symbol indented_block_body) nil))
+      :type "class")
+     nil nil) ;; doc "Documentation string"
     ("MultipleInheritance" type
      (:superclasses ("Parent1" "Parent2")
       :members
@@ -303,21 +305,15 @@ r, s, t = 1, 2, '3'
       (("method" function
 	(:arguments
 	 (("this" variable
-	   nil (reparse-symbol function_parameters) nil))
-	 :parent
-	 "dummy")
+	   nil (reparse-symbol function_parameters) nil)))
 	(reparse-symbol indented_block_body) nil)
        ("method2" function
-	(:parent
-	 "dummy"
-	 :arguments
+	(:arguments
 	 (("self" variable
 	   nil (reparse-symbol function_parameters) nil)))
 	(reparse-symbol indented_block_body) nil)
        ("method3" function
-	(:parent
-	 "dummy"
-	 :arguments
+	(:arguments
 	 (("self" variable
 	   nil (reparse-symbol function_parameters) nil)
 	  ("a" variable
@@ -407,7 +403,7 @@ r, s, t = 1, 2, '3'
     ("if"      code     nil nil nil)
     ("x"       variable nil nil nil)
     ("y"       variable nil nil nil)
-    ("r, s, t" code nil nil nil) ;; TODO should be multiple variable tags
+    ("r, s, t" code     nil nil nil) ;; TODO should be multiple variable tags
     )
   "List of expected tag names for Python.")
 
@@ -882,7 +878,7 @@ INSERTME is the text to be inserted after the deletion."
   (cedet-utest-log " * Java tests...")
   (semantic-utest-Java)
   (cedet-utest-log " * Javascript tests...")
-  (semantic-utest-Javascript)
+  ;;(semantic-utest-Javascript)
   (cedet-utest-log " * Makefile tests...")
   (semantic-utest-Makefile)
   (cedet-utest-log " * Scheme tests...")

@@ -26,7 +26,7 @@
 
 (require 'inversion)
 
-(defvar cedet-cscope-min-version "15.7"
+(defvar cedet-cscope-min-version "16.0"
   "Minimum version of CScope required.")
 
 ;;;###autoload

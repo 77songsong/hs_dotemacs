@@ -1,8 +1,8 @@
 ;; Object SRecode templates
-;; EDE Project Files are auto generated: Do Not Edit
+;; EDE project file.
 (ede-proj-project "SRecode templates"
-  :file "Project.ede"
   :name "templates"
+  :file "Project.ede"
   :targets (list 
    (ede-proj-target-makefile-miscelaneous "templates"
     :name "templates"
@@ -13,16 +13,6 @@
     :name "document"
     :path ""
     :source '("document-default.srt" "srecode-document-cpp.srt" "srecode-document-java.srt")
-    )
-   (ede-proj-target-makefile-miscelaneous "android"
-    :name "android"
-    :path ""
-    :source '("android-java.srt")
-    )
-   (ede-proj-target-makefile-miscelaneous "arduino"
-    :name "arduino"
-    :path ""
-    :source '("arduino-pde.srt")
     )
    )
   )

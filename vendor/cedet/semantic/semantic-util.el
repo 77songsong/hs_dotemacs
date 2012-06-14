@@ -298,7 +298,6 @@ If TAG is not specified, use the tag at point."
 		      semantic-dump-parse
 		      semantic-type-relation-separator-character
 		      semantic-command-separation-character
-		      semantic-new-buffer-fcn-was-run
 		      )))
 	  (dolist (V vars)
 	    (semantic-describe-buffer-var-helper V buff)))

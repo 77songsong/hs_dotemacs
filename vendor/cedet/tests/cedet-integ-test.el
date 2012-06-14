@@ -1,6 +1,6 @@
 ;;; cedet-integ-test.el --- CEDET full integration tests.
 
-;; Copyright (C) 2008, 2009, 2010, 2011, 2012 Eric M. Ludlam
+;; Copyright (C) 2008, 2009, 2010 Eric M. Ludlam
 
 ;; Author: Eric M. Ludlam <eric@siege-engine.com>
 
@@ -100,10 +100,7 @@
 (require 'cogre)
 
 (eval-and-compile
-  (defvar cedet-integ-base
-    (if (eq system-type 'windows-nt)
-	(expand-file-name "CEDET_INTEG" temporary-file-directory)
-      "/tmp/CEDET_INTEG")
+  (defvar cedet-integ-base "/tmp/CEDET_INTEG"
     "Root of multiple project integration tests.")
   )
 
@@ -113,11 +110,8 @@
 (require 'cit-srec)
 (require 'cit-el)
 (require 'cit-texi)
-(require 'cit-projvar)
 (require 'cit-externaldb)
 (require 'cit-gnustep)
-(require 'cit-android)
-(require 'cit-arduino)
 (require 'cit-dist)
 
 (defvar cedet-integ-target (expand-file-name "edeproj" cedet-integ-base)
@@ -191,9 +185,6 @@ Optional argument MAKE-TYPE is the style of EDE project to test."
     ;; Do some texinfo documentation.
     (cit-srecode-fill-texi)
 
-    ;; Test out EDE project local variables
-    (cit-proj-variables)
-
     ;; Create a distribution
     (find-file (expand-file-name "README" cedet-integ-target))
     (cit-make-dist)
@@ -205,7 +196,7 @@ Optional argument MAKE-TYPE is the style of EDE project to test."
   "Run the CEDET integration test using GNUStep style project."
   (interactive)
 
-  ;; Do an EDE GNUstep-Make Project
+  ;; Do a EDE GNUstep-Make Project
   (make-directory (concat cedet-integ-target "_ede_GSMake") t)
   (find-file (expand-file-name "README" (concat cedet-integ-target "_ede_GSMake"))) ;; only to change dir
   (let ((ede-auto-add-method 'always))
@@ -213,30 +204,6 @@ Optional argument MAKE-TYPE is the style of EDE project to test."
 
   (cit-finish-message "PASSED" "GNUStep")
   )
-
-(defun cedet-integ-test-Android ()
-  "Run the CEDET integration test using the Android style project."
-  (interactive)
-
-  (let ((ede-auto-add-method 'never))
-    (global-ede-mode 1)
-    ;; Do an EDE Android project. Use cedet-android.el for project fabrication.
-    (cit-ede-android-test)
-
-    (cit-finish-message "PASSED" "Android")
-    ))
-
-(defun cedet-integ-test-Arduino ()
-  "Run the CEDET integration test using the Android style project."
-  (interactive)
-
-  (let ((ede-auto-add-method 'never))
-    (global-ede-mode 1)
-    ;; Do an EDE Android project. Use cedet-android.el for project fabrication.
-    (cit-ede-arduino-test)
-
-    (cit-finish-message "PASSED" "Arduino")
-    ))
 
 (defun cit-finish-message (message style)
   "Display a MESSAGE that some test is now finished.
@@ -257,7 +224,7 @@ Argument STYLE is the type of build done."
 (defun cit-make-dir (dir)
   "Make directory DIR if it doesn't exist."
   (when (not (file-exists-p dir))
-    (make-directory dir t)))
+    (make-directory dir)))
 
 (defun cit-file (filename)
   "Return a testing filename.
@@ -292,11 +259,24 @@ EMPTY-DICT-ENTRIES are dictionary entries for the EMPTY fill macro."
     (setq post-empty-tags (semantic-fetch-tags))
 
     (sit-for 0)
-
     ;;
     ;; Add in our tags
     ;;
-    (cit-srecode-insert-taglist tags)
+    (dolist (tag tags)
+
+      ;; 3 b) Srecode to make more sources
+      ;; 3 c) Test incremental parsers (by side-effect)
+      (let ((e (srecode-semantic-insert-tag tag))
+	    (code (semantic-tag-get-attribute tag :code)))
+      
+	(when code (insert code))
+
+	(goto-char e)
+	(sit-for 0)
+	)
+      )
+
+    (save-buffer)
 
     ;; Make sure the tags we have are the same as the tags we tried
     ;; to insert.
@@ -306,25 +286,6 @@ EMPTY-DICT-ENTRIES are dictionary entries for the EMPTY fill macro."
 
 
     ))
-
-(defun cit-srecode-insert-taglist (tags)
-  "Insert the list of TAGS at point in buffer."
-  (dolist (tag tags)
-
-    ;; 3 b) Srecode to make more sources
-    ;; 3 c) Test incremental parsers (by side-effect)
-    (let ((e (srecode-semantic-insert-tag tag))
-	  (code (semantic-tag-get-attribute tag :code)))
-      
-      (when code (insert code))
-
-      (goto-char e)
-      (sit-for 0)
-      )
-    )
-  
-  (save-buffer)
-  )
 
 (defclass cit-tag-verify-error-debug ()
   ((actual :initarg :actual
@@ -346,11 +307,7 @@ are found, but don't error if they are not their."
 	  (T2 (car expected)))
 
       (cond
-       ((semantic-tag-similar-p T1 T2 
-				:default-value 
-				:code
-				:documentation ;; TODO - can we get this removed?
-				)
+       ((semantic-tag-similar-p T1 T2 :default-value)
 
 	(let ((mem1 (semantic-tag-components T1))
 	      (mem2 (semantic-tag-components T2)))
@@ -363,7 +320,7 @@ are found, but don't error if they are not their."
 	)
 
 	;;it might be in a list of extra tags???
-       ((semantic-tag-similar-p T1 (car extra) :default-value :members)
+       ((semantic-tag-similar-p T1 (car extra) :default-value)
 
 	;; Don't check members.  These should be simple cases for now.
 	(setq extra (cdr extra))
@@ -389,32 +346,16 @@ are found, but don't error if they are not their."
 Optional ARGS are additional arguments to add to the compile command,
 such as 'clean'."
   (let ((bufftokill (find-file (cit-file "Project.ede"))))
-    ;; 1 f) Create a build file if needed..
-    (if (ede-proj-project-child-p (ede-current-project))
-	(ede-proj-regenerate))
+    ;; 1 f) Create a build file.
+    (ede-proj-regenerate)
     ;; 1 g) build the sources.
-    (if (not ARGS)
-	(cit-compile-and-wait-using-ede-command)
-
-      ;; If args, use our own command.
-      (compile (concat ede-make-command (or ARGS "")))
+    (compile (concat ede-make-command (or ARGS "")))
     
-      (cit-wait-for-compilation)
-      (cit-check-compilation-for-error))
+    (cit-wait-for-compilation)
+    (cit-check-compilation-for-error)
 
-    ;; Kill off tmp buffer.
     (kill-buffer bufftokill)
     ))
-
-(defun cit-compile-and-wait-using-ede-command ()
-  "Compile our current project using EDE commands, but wait for it to finish.
-Optional arguments can't be used."
-  ;; 1 g) build the sources.
-  (ede-compile-project)
-
-  (cit-wait-for-compilation)
-  (cit-check-compilation-for-error)
-  )
 
 (defun cit-wait-for-compilation ()
   "Wait for a compilation to finish."
