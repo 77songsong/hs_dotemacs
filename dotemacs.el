@@ -35,6 +35,6 @@
 (load-my-library "my-maxframe")
 (load-my-library "my-colortheme")
 (load-my-library "my-zenburn")
-(load-my-library "my-ecb")
+;;(load-my-library "my-ecb")
 
 (cd "~/")
