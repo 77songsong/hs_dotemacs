@@ -1,7 +1,7 @@
 ;; renn-devel.el
 ;; This files set the Environment for Software Develomentation to Emacs
 
-;; flymake mode
+``;; flymake mode
 ;;(require 'flymake)
 ;;(require 'flymake-cursor)
 
@@ -16,6 +16,17 @@
 
 (setq-default c-basic-offset 4
               indent-tabs-mode nil)
+
+(defun my-c-mode-common-hook ()
+  (c-set-style "stroustrup")
+  (c-set-offset 'case-label '+)
+  (c-set-offset 'statement-case-open '+)
+  (c-set-offset 'inline-open 0)
+  (set-variable 'c-backslash-max-column 100)
+  (define-key c-mode-base-map "\C-m" 'c-context-line-break)
+  (define-key c-mode-base-map "\C-c\C-c" 'comment-or-uncomment-region)
+  )
+(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
 ;; ----- Objective-C
 
