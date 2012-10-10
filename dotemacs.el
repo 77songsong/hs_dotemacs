@@ -25,7 +25,6 @@
 (load-my-library "my-ido")
 (load-my-library "my-autoinstall")
 ;;(load-my-library "renn-shell")
-(load-my-library "my-devel")
 ;;(load-my-library "renn-css")
 ;;(load-my-library "renn-python")
 ;;(load-my-library "renn-html")
@@ -34,7 +33,7 @@
 (load-my-library "my-autocomplete")
 (load-my-library "my-maxframe")
 (load-my-library "my-colortheme")
-(load-my-library "my-zenburn")
 ;;(load-my-library "my-ecb")
+(load-my-library "my-devel")
 
 (cd "~/")

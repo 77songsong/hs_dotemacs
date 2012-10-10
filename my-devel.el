@@ -65,3 +65,10 @@
 
 ;; cscope
 (require 'xcscope)
+
+
+;; default color theme
+(unless (eq window-system nil)
+  (progn 
+    ;; (zenburn)
+    (load-theme 'solarized-light t)))
