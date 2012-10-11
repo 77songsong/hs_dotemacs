@@ -6,12 +6,6 @@
 (add-to-list 'load-path "~/.emacs.d/vendor")
 (add-to-list 'load-path "~/.emacs.d/autoinstall")
 
-;; system-type: gnu, gnu/linux, darwin, ms-dos, windows-nt, cygwin, ...
-(cond
- ((eq system-type 'darwin) (load-library "my-osx"))
- ((eq system-type 'windows-nt) (load-library "my-win32"))
- ((eq system-type 'gnu/linux) (load-library "my-linux")))
-
 ;; load default functions
 (load-library "my-func")
 
@@ -35,5 +29,11 @@
 (load-my-library "my-colortheme")
 ;;(load-my-library "my-ecb")
 (load-my-library "my-devel")
+
+;; system-type: gnu, gnu/linux, darwin, ms-dos, windows-nt, cygwin, ...
+(cond
+ ((eq system-type 'darwin) (load-library "my-osx"))
+ ((eq system-type 'windows-nt) (load-library "my-win32"))
+ ((eq system-type 'gnu/linux) (load-library "my-linux")))
 
 (cd "~/")
