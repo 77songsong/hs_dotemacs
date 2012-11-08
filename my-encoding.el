@@ -4,6 +4,7 @@
 
 (defun set-encoding-utf-8 ( )
   "set encoding as utf-8"
+  (interactive)
   (prefer-coding-system 'utf-8)
 
   (setq-default coding-system 'utf-8)
@@ -20,6 +21,7 @@
 
 (defun set-encoding-euc-kr ( )
   "set encoding as euc-kr"
+  (interactive)
   (prefer-coding-system 'euc-kr)
 
   (setq-default coding-system 'euc-kr)
