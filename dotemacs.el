@@ -29,6 +29,7 @@
 (load-my-library "my-colortheme")
 ;;(load-my-library "my-ecb")
 (load-my-library "my-devel")
+(load-my-library "my-markdown")
 
 ;; system-type: gnu, gnu/linux, darwin, ms-dos, windows-nt, cygwin, ...
 (cond
